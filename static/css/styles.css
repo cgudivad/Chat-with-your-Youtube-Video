@@ -1,0 +1,57 @@
+#model {
+    width: fit-content;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9b9b9b;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #676767;
+}
+
+/* Styles for desktop screens */
+@media only screen and (min-width: 768px) {
+
+    .banner {
+        max-width: 50%;
+    }
+
+    textarea {
+        height: 120px;
+    }
+
+    .label-img {
+        width: 2%;
+    }
+}
+
+/* Styles for mobile screens */
+@media only screen and (max-width: 767px) {
+
+    .banner {
+        max-width: 80%;
+    }
+
+    textarea {
+        height: 180px;
+    }
+
+    .label-img {
+        width: 5%;
+    }
+
+    .label-img.url-img {
+        width: 7%;
+    }
+
+}
