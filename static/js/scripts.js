@@ -1,7 +1,6 @@
 $(document).ready(function () {
   if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-    $("#micButton").addClass("d-flex");
-    $("#micButton").show();
+    $("#micButton").addClass("d-flex").show();
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
@@ -33,11 +32,6 @@ $(document).ready(function () {
     $("#micButton").hide();
   }
 
-  const alertMap = {
-    error: "danger",
-    success: "success",
-  };
-
   $("#darkModeSwitch").change(function () {
     if ($(this).is(":checked")) {
       $("html").attr("data-bs-theme", "dark");
@@ -46,14 +40,8 @@ $(document).ready(function () {
     }
   });
 
-  $(".btn-close").click(function () {
-    hideMessage();
-  });
-
   $("#loadButton").click((event) => {
     event.preventDefault();
-
-    hideMessage();
 
     if (!$("#url").val()) {
       showMessage("error", "Youtube URL is required!");
@@ -82,7 +70,6 @@ $(document).ready(function () {
 
   $("#generateButton").click((event) => {
     event.preventDefault();
-    hideMessage();
 
     if (!$("#prompt").val()) {
       showMessage("error", "Prompt is required!");
@@ -121,12 +108,12 @@ $(document).ready(function () {
               $("#response")
                 .html()
                 .replaceAll(" **", " <b>")
-                .replaceAll("**:", "</b>:")
+                .replaceAll("**", "</b>")
             );
             return;
           }
           text = textDecoder.decode(value);
-          $("#response").html($("#response").html() + text);
+          $("#response").append(text);
           $("html, body").animate(
             {
               scrollTop: $("#responseDiv").offset().top,
@@ -148,25 +135,30 @@ $(document).ready(function () {
   }
 
   function showMessage(status, message) {
-    $("#displayMessage").text(message);
-    $("#displayMessageDiv").addClass("alert-" + alertMap[status]);
-    $("#displayMessageDiv").show();
-  }
-
-  function hideMessage() {
-    $("#displayMessageDiv").removeClass("alert-danger alert-success");
-    $("#displayMessageDiv").hide();
+    if (status === "error") {
+      $("h4#modalHeading")
+        .text("Error")
+        .removeClass("text-success")
+        .addClass("text-danger");
+    } else if (status === "success") {
+      $("h4#modalHeading")
+        .text("Success")
+        .removeClass("text-danger")
+        .addClass("text-success");
+    }
+    $("#modalContent").text(message);
+    $("#openModal").trigger("click");
   }
 
   function addSpinner(element) {
     $(element).prop("disabled", true);
-    $(element).append(
-      '   <span class="spinner-border spinner-border-sm"></span>'
-    );
+    $(element).find("#buttonText").hide();
+    $(element).find("#buttonSpinner").show();
   }
 
   function removeSpinner(element) {
-    $(element).find("span").remove();
+    $(element).find("#buttonText").show();
+    $(element).find("#buttonSpinner").hide();
     $(element).prop("disabled", false);
   }
 });
