@@ -1,11 +1,9 @@
-from flask import Flask, render_template, request, session, jsonify, Response, make_response
+from flask import Flask, render_template, request, Response
+from http import HTTPStatus
 from utils import load, generate
-import os
 
 application = Flask(__name__)
 application.config['STATIC_FOLDER'] = 'static'
-application.config['PERMANENT_SESSION_LIFETIME'] = 86400
-application.secret_key = os.urandom(64).hex()
 
 @application.route('/', methods=['GET'])
 def index():
@@ -13,24 +11,21 @@ def index():
 
 @application.route('/load', methods=['POST'])
 def load_controller():
-    session['url'] = request.form.get('url')
-    status, data = load(session['url'])
+    status, data = load(request.form.get('url'))
     if status == 'error':
-        return jsonify({'status': status, 'message': data})
-    elif status == 'success':
-        session['name_space'] = data
-        return jsonify({'status': status})
+        return Response(data, status=HTTPStatus.BAD_REQUEST)
+    response = Response()
+    response.set_cookie('name_space', data)
+    return response
 
 @application.route('/generate', methods=['POST'])
 def generate_controller():
-    session['prompt'] = request.form.get('prompt')
-    session['model'] = request.form.get('model')
-    if not session.get('name_space', ''):
-        response = make_response()
-        response.status = "400 Please load a video first"
-        return response
-    return Response(generate(session['model'], session['name_space'], session['prompt']), content_type='text/plain')
-
+    prompt = request.form.get('prompt')
+    model = request.form.get('model')
+    name_space = request.cookies.get('name_space')
+    if not name_space:
+        return Response("Please load a video first", status=HTTPStatus.BAD_REQUEST)
+    return Response(generate(model, name_space, prompt))
 
 if __name__ == '__main__':
     application.run(debug=True,  threaded=True)

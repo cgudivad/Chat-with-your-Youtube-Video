@@ -1,4 +1,38 @@
 $(document).ready(function () {
+  if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+    $("#micButton").addClass("d-flex");
+    $("#micButton").show();
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    const prompt = document.getElementById("prompt");
+
+    $("#micButton").click(function () {
+      prompt.textContent = "Listening...";
+      recognition.start();
+    });
+
+    recognition.onresult = (event) => {
+      prompt.textContent = event.results[0][0].transcript;
+    };
+
+    recognition.onaudioend = (event) => {
+      if (prompt.textContent === "Listening...") {
+        prompt.textContent = "";
+      }
+      $("#generateButton").trigger("click");
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Error occurred in recognition: " + event.error);
+    };
+  } else {
+    $("#micButton").hide();
+  }
+
   const alertMap = {
     error: "danger",
     success: "success",
@@ -26,9 +60,8 @@ $(document).ready(function () {
       return;
     }
 
-    $("#loadButton").append(
-      '   <span class="spinner-border spinner-border-sm"></span>'
-    );
+    addSpinner("#loadButton");
+
     $.ajax({
       type: "POST",
       url: "/load",
@@ -36,24 +69,19 @@ $(document).ready(function () {
         url: $("#url").val(),
       },
       success: function (response) {
-        if (response.status == "error") {
-          showMessage("error", response.message);
-        } else if (response.status == "success") {
-          showMessage("success", "Video loaded successfully!");
-        }
+        showMessage("success", "Video loaded successfully!");
       },
       error: function (xhr, status, error) {
-        console.error(xhr.responseText);
+        showMessage("error", xhr.responseText);
       },
       complete: function () {
-        $("#loadButton").find("span").remove();
+        removeSpinner("#loadButton");
       },
     });
   });
 
   $("#generateButton").click((event) => {
     event.preventDefault();
-
     hideMessage();
 
     if (!$("#prompt").val()) {
@@ -61,9 +89,7 @@ $(document).ready(function () {
       return;
     }
 
-    $("#generateButton").append(
-      '   <span class="spinner-border spinner-border-sm"></span>'
-    );
+    addSpinner("#generateButton");
 
     $("#responseDiv").hide();
     $("#response").empty();
@@ -82,42 +108,42 @@ $(document).ready(function () {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(response.statusText);
+          return response.text().then((errorMessage) => {
+            throw new Error(errorMessage);
+          });
         }
         const reader = response.body.getReader();
         const textDecoder = new TextDecoder();
-        startFlag = false;
         const processChunk = ({ value, done }) => {
           if (done) {
-            $("#generateButton").find("span").remove();
+            removeSpinner("#generateButton");
+            $("#response").html(
+              $("#response")
+                .html()
+                .replaceAll(" **", " <b>")
+                .replaceAll("**:", "</b>:")
+            );
             return;
           }
           text = textDecoder.decode(value);
-          if (text.includes('**')) {
-            // if(startFlag) {
-            //   text = text.replace('**', '</b>');
-            // } else {
-            //   text = text.replace('**', '<b>');
-            // }
-            // startFlag = !startFlag;
-            text = text.replace('**', '');
-          }
-          $("#response").html(
-            $("#response").html() + text
+          $("#response").html($("#response").html() + text);
+          $("html, body").animate(
+            {
+              scrollTop: $("#responseDiv").offset().top,
+            },
+            0
           );
-          $('html, body').animate({
-            scrollTop: $('#responseDiv').offset().top
-          }, 0);
           reader.read().then(processChunk);
         };
         $("#responseDiv").show();
         reader.read().then(processChunk);
       })
       .catch((error) => {
+        console.log(error);
         showMessage("error", error);
       })
       .finally(() => {
-        $("#generateButton").find("span").remove();
+        removeSpinner("#generateButton");
       });
   }
 
@@ -130,5 +156,17 @@ $(document).ready(function () {
   function hideMessage() {
     $("#displayMessageDiv").removeClass("alert-danger alert-success");
     $("#displayMessageDiv").hide();
+  }
+
+  function addSpinner(element) {
+    $(element).prop("disabled", true);
+    $(element).append(
+      '   <span class="spinner-border spinner-border-sm"></span>'
+    );
+  }
+
+  function removeSpinner(element) {
+    $(element).find("span").remove();
+    $(element).prop("disabled", false);
   }
 });
