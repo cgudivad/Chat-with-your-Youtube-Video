@@ -4,3 +4,4 @@ __pycache__
 backup
 .ebignore
 .env
+test.py

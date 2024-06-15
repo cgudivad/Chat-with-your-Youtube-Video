@@ -28,4 +28,4 @@ def generate_controller():
     return Response(generate(model, name_space, prompt))
 
 if __name__ == '__main__':
-    app.run(debug=True,  threaded=True)
+    app.run(threaded=True)
