@@ -64,3 +64,4 @@ urllib3==2.2.1
 Werkzeug==3.0.1
 yarl==1.9.4
 youtube-transcript-api==0.6.2
+gunicorn==22.0.0
