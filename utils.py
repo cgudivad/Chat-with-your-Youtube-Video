@@ -13,8 +13,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 load_dotenv()
 
-YT_API_KEY = os.getenv("YT_API_KEY")
-YT_API_URL = os.getenv("YT_API_URL")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 EMBEDDINGS_MODEL = os.getenv("EMBEDDINGS_MODEL")
 
