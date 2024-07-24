@@ -12,11 +12,10 @@ $ pip install -r requirements.txt
 ```
 
 ## Step 2: Set Up Environment Variables
-  ### 2.1: Create OpenAI, Pinecone and Youtube Transcriptor accounts and get the API Keys, Endpoints.
+  ### 2.1: Create OpenAI and Pinecone accounts and get the API Keys, Endpoints.
 
   1. **OpenAI:** https://platform.openai.com/api-keys
   2. **Pinecone:** https://app.pinecone.io/
-  3. **Youtube Transcriptor:** https://rapidapi.com/illmagination/api/youtube-captions-and-transcripts
 
   ### 2.2: Create a .env file in the root directory of your project and fill in the following details:
 ```plaintext
@@ -26,9 +25,6 @@ OPENAI_API_KEY=Enter your OpenAI API key here
 PINECONE_INDEX_NAME=Enter your Pinecone Index Name here
 PINECONE_API_ENV=Enter your Pinecone Environment endpoint here
 PINECONE_API_KEY=Enter your Pinecone API key here
-
-YT_API_URL=Enter your Youtube Transcript endpoint here
-YT_API_KEY=Enter your Youtube Transcript API key here
 ```
 
 ## Step 3: Run the Application
