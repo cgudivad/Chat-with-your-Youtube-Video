@@ -50,23 +50,26 @@ def get_transcript(video_id):
     print("In get_transcript:video_id", video_id)
     transcript = None
     try:
+        print("In first try before:transcript", transcript)
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
-        print("In first try:transcript", transcript)
+        print("In first try after:transcript", transcript)
     except Exception as e:
         try:
+            print("In second try before:transcript_list")
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            print("In second try:transcript_list", transcript_list)
+            print("In second try after:transcript_list", transcript_list)
             for transcript_obj in transcript_list:
                 print("In for loop:transcript_obj", transcript_obj)
                 if transcript_obj.is_translatable:
                     try:
+                        print("In third try bfeore:transcript", transcript)
                         transcript = transcript_obj.translate('en').fetch()
-                        print("In third try:transcript", transcript)
+                        print("In third try after:transcript", transcript)
                         break
                     except Exception as e:
-                        print(e)
+                        print("Second level exception", e)
         except Exception as e:
-            print(e)
+            print("First level exception", e)
 
     if transcript is None:
         return ("error", "No transcript found")
