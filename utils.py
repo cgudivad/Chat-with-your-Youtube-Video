@@ -51,13 +51,17 @@ def get_transcript(video_id):
     transcript = None
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        print("In first try:transcript", transcript)
     except Exception as e:
         try:
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            print("In second try:transcript_list", transcript_list)
             for transcript_obj in transcript_list:
+                print("In for loop:transcript_obj", transcript_obj)
                 if transcript_obj.is_translatable:
                     try:
                         transcript = transcript_obj.translate('en').fetch()
+                        print("In third try:transcript", transcript)
                         break
                     except Exception as e:
                         print(e)

@@ -5,3 +5,4 @@ backup
 .ebignore
 .env
 test.py
+.conda
