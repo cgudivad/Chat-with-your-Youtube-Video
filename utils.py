@@ -47,7 +47,7 @@ def get_name_spaces():
     return Pinecone().Index(PINECONE_INDEX_NAME).describe_index_stats()['namespaces']
 
 def get_transcript(video_id):
-
+    print("In get_transcript:video_id", video_id)
     transcript = None
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
