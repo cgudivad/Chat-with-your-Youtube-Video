@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
@@ -27,7 +28,7 @@ Question: {question}
 prompt = ChatPromptTemplate.from_template(template)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
 embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL)
-model_map = {"gpt-3.5-turbo": 5, "gpt-4-turbo-preview": 10}
+model_map = {"gpt-4-turbo-preview": 10, "chatgpt-4o-latest": 10, "claude-3-opus-20240229": 10, "claude-3-sonnet-20240229": 10}
 
 def get_video_id(url):
     if "youtube.com/watch" in url:
@@ -47,29 +48,22 @@ def get_name_spaces():
     return Pinecone().Index(PINECONE_INDEX_NAME).describe_index_stats()['namespaces']
 
 def get_transcript(video_id):
-    print("In get_transcript:video_id", video_id)
+
     transcript = None
     try:
-        print("In first try before:transcript", transcript)
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
-        print("In first try after:transcript", transcript)
     except Exception as e:
         try:
-            print("In second try before:transcript_list")
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            print("In second try after:transcript_list", transcript_list)
             for transcript_obj in transcript_list:
-                print("In for loop:transcript_obj", transcript_obj)
                 if transcript_obj.is_translatable:
                     try:
-                        print("In third try bfeore:transcript", transcript)
                         transcript = transcript_obj.translate('en').fetch()
-                        print("In third try after:transcript", transcript)
                         break
                     except Exception as e:
-                        print("Second level exception", e)
+                        print(e)
         except Exception as e:
-            print("First level exception", e)
+            print(e)
 
     if transcript is None:
         return ("error", "No transcript found")
@@ -109,7 +103,10 @@ def load(url):
     return ("success", name_space)
 
 def generate(model, name_space, question):
-    model_obj = ChatOpenAI(model=model, streaming=True)
+    if model.find("gpt") >= 0:
+        model_obj = ChatOpenAI(model=model, streaming=True)
+    else:
+        model_obj = ChatAnthropic(model_name=model, streaming=True)
     pinecone = PineconeVectorStore(
             embedding=embeddings, index_name=PINECONE_INDEX_NAME, namespace=name_space
         )
@@ -130,7 +127,7 @@ if __name__ == "__main__":
     # end_time = time.time()
     # print("load Elapsed time:", end_time - start_time, "seconds")
     # start_time = time.time()
-    # for chunk in generate("gpt-4-turbo-preview", get_name_space("java-interview-questions"), "what is the life cycle of servlet?"):
+    # for chunk in generate("chatgpt-4o-latest", get_name_space("java-interview-questions"), "what is the life cycle of servlet?"):
     #     print(chunk)
     # end_time = time.time()
     # print("generate Elapsed time:", end_time - start_time, "seconds")

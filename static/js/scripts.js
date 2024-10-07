@@ -1,4 +1,11 @@
 $(document).ready(function () {
+  const modelMap = {
+    "chatgpt-4o-latest": "GPT 4o",
+    "gpt-4-turbo-preview": "GPT 4",
+    "claude-3-opus-20240229": "Claude 3 Opus",
+    "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+  };
+
   if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
     $("#micButton").addClass("d-flex").show();
     const SpeechRecognition =
@@ -71,25 +78,58 @@ $(document).ready(function () {
   $("#generateButton").click((event) => {
     event.preventDefault();
 
-    if (!$("#prompt").val()) {
+    const prompt = $("#prompt").val();
+    const selectedModels = $("input[name='models']:checked")
+      .map(function () {
+        return this.value;
+      })
+      .get();
+
+    if (!prompt) {
       showMessage("error", "Prompt is required!");
+      return;
+    }
+
+    if (selectedModels.length === 0) {
+      showMessage("error", "Please select at least one model!");
       return;
     }
 
     addSpinner("#generateButton");
 
-    $("#responseDiv").hide();
-    $("#response").empty();
+    $("#responseDiv").empty();
 
-    streamData();
+    streamDataForAllModels(prompt, selectedModels);
   });
 
-  function streamData(promptValue, modelValue) {
+  function streamDataForAllModels(prompt, selectedModels) {
+    const promises = selectedModels.map((model) => streamData(prompt, model));
+
+    Promise.all(promises)
+      .then(() => {
+        removeSpinner("#generateButton");
+      })
+      .catch((error) => {
+        console.log(error);
+        showMessage("error", error);
+        removeSpinner("#generateButton");
+      });
+  }
+
+  function streamData(prompt, model) {
     const url = "/generate";
     const formData = new FormData();
-    formData.append("prompt", $("#prompt").val());
-    formData.append("model", $("#model").val());
-    fetch(url, {
+    formData.append("prompt", prompt);
+    formData.append("model", model);
+    modelResponseContainer = `<div id="div_${model}" name="div_${model}" style="display:none;">
+            <label class="form-label ms-1" id="label_${model}" name="label_${model}"><b>${modelMap[model]}</b></label>
+            <pre class="form-control border-2 border-secondary" id="response_${model}"
+              name="response_${model}"
+              style="white-space: pre-wrap; font-family: sans-serif;"></pre>
+          </div>`;
+    $("#responseDiv").append(modelResponseContainer);
+
+    return fetch(url, {
       method: "POST",
       body: formData,
     })
@@ -101,36 +141,29 @@ $(document).ready(function () {
         }
         const reader = response.body.getReader();
         const textDecoder = new TextDecoder();
+
         const processChunk = ({ value, done }) => {
           if (done) {
-            removeSpinner("#generateButton");
-            $("#response").html(
-              $("#response")
+            $(`#response_${model}`).html(
+              $(`#response_${model}`)
                 .html()
                 .replaceAll(" **", " <b>")
                 .replaceAll("**", "</b>")
             );
             return;
           }
-          text = textDecoder.decode(value);
-          $("#response").append(text);
-          $("html, body").animate(
-            {
-              scrollTop: $("#responseDiv").offset().top,
-            },
-            0
-          );
+
+          const text = textDecoder.decode(value);
+          $(`#response_${model}`).append(text);
           reader.read().then(processChunk);
         };
-        $("#responseDiv").show();
+
+        $(`#div_${model}`).show();
         reader.read().then(processChunk);
       })
       .catch((error) => {
         console.log(error);
-        showMessage("error", error);
-      })
-      .finally(() => {
-        removeSpinner("#generateButton");
+        showMessage("error", `Error for model ${model}: ${error.message}`);
       });
   }
 
