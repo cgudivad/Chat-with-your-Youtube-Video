@@ -103,9 +103,15 @@ $(document).ready(function () {
   });
 
   function streamDataForAllModels(prompt, selectedModels) {
-    const promises = selectedModels.map((model) => streamData(prompt, model));
+    const promises = selectedModels.map((model) =>
+      streamData(prompt, model).catch((error) => {
+        console.log(`Error for model ${model}: ${error.message}`);
+        showMessage("error", `Error for model ${model}: ${error.message}`);
+        return null; // Prevent it from halting other requests
+      })
+    );
 
-    Promise.all(promises)
+    Promise.allSettled(promises)
       .then(() => {
         removeSpinner("#generateButton");
       })
