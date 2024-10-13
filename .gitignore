@@ -6,4 +6,3 @@ backup
 .env
 test.py
 .conda
-Procfile
