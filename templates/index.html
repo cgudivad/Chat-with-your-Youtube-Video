@@ -2,15 +2,65 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
+  <title>Video Insights with LLMs</title>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat with Your Youtube Video</title>
+  <meta name="description"
+    content="Fetch YouTube video transcripts and ask AI-powered questions about the content. Utilize AI tools like OpenAI and Claude to gain insights from video transcripts with our smart application.">
+  <meta name="keywords"
+    content="YouTube transcripts, AI answers, video insights, OpenAI, Claude, Pinecone, vector store, question answering, LLM">
+  <meta property="og:title" content="Get YouTube Video Transcripts & AI Answers">
+  <meta property="og:description"
+    content="Fetch YouTube video transcripts and get AI-generated insights powered by OpenAI and Claude.">
+  <meta property="og:url" content="https://www.chatwithyoutube.info/">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename= 'images/favicon.png') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="{{ url_for('static', filename= 'js/scripts.js') }}"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7670323439433982"
+    crossorigin="anonymous"></script>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename= 'css/styles.css') }}" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "YouTube Video Transcript and AI Answering App",
+      "operatingSystem": "Web",
+      "applicationCategory": "Education, Utility",
+      "description": "Fetch YouTube video transcripts and ask AI questions about the video content using LLMs like OpenAI and Claude.",
+      "url": "https://www.chatwithyoutube.info/",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "How does the app fetch YouTube transcripts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The app fetches YouTube transcripts using the YouTube API, processes the transcript, and stores it in a vector database for AI-powered question answering."
+          }
+        }, {
+          "@type": "Question",
+          "name": "What AI models are used for answering questions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The app uses models like OpenAI GPT and Claude to provide accurate answers based on the video transcripts."
+          }
+        }]
+      }
+  </script>
+
 </head>
 
 <body>
