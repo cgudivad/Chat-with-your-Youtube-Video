@@ -19,8 +19,12 @@ $ pip install -r requirements.txt
 
   ### 2.2: Create a .env file in the root directory of your project and fill in the following details:
 ```plaintext
+SECRET_KEY=Enter your Flask Application Secret Key here
+
 EMBEDDINGS_MODEL=Enter your Embedding Model here
 OPENAI_API_KEY=Enter your OpenAI API key here
+
+ANTHROPIC_API_KEY=Enter your Anthropic API key here
 
 PINECONE_INDEX_NAME=Enter your Pinecone Index Name here
 PINECONE_API_ENV=Enter your Pinecone Environment endpoint here
